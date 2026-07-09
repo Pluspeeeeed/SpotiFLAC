@@ -72,11 +72,11 @@ type CoverClient struct {
 
 func NewCoverClient() *CoverClient {
 	return &CoverClient{
-		httpClient: &http.Client{Timeout: 30 * time.Second},
+		httpClient: NewHTTPClient(30 * time.Second),
 	}
 }
 
-func buildCoverFilename(trackName, artistName, albumName, albumArtist, releaseDate, filenameFormat, playlistName, isrc, category, upc, artists string, includeTrackNumber bool, position, discNumber, totalTracks, totalDiscs int, useAlbumTrackNumber bool) string {
+func buildCoverFilename(trackName, artistName, albumName, albumArtist, releaseDate, filenameFormat, playlistName, isrc, category, upc, artists string, includeTrackNumber bool, position, discNumber int, useAlbumTrackNumber bool, totalTracks, totalDiscs int) string {
 	if strings.Contains(filenameFormat, "{") {
 		filenameFormat = ApplyExtraFilenameTokens(filenameFormat, artists, totalTracks, totalDiscs)
 		filenameFormat = ApplyFilenameContextTokens(filenameFormat, category, playlistName, "", upc)
@@ -224,7 +224,7 @@ func (c *CoverClient) DownloadCover(req CoverDownloadRequest) (*CoverDownloadRes
 	if filenameFormat == "" {
 		filenameFormat = "title-artist"
 	}
-	filename := buildCoverFilename(req.TrackName, req.ArtistName, req.AlbumName, req.AlbumArtist, req.ReleaseDate, filenameFormat, req.PlaylistName, req.ISRC, req.Category, req.UPC, req.Artists, req.TrackNumber, req.Position, req.DiscNumber, req.TotalTracks, req.TotalDiscs, req.UseAlbumTrackNumber)
+	filename := buildCoverFilename(req.TrackName, req.ArtistName, req.AlbumName, req.AlbumArtist, req.ReleaseDate, filenameFormat, req.PlaylistName, req.ISRC, req.Category, req.UPC, req.Artists, req.TrackNumber, req.Position, req.DiscNumber, req.UseAlbumTrackNumber, req.TotalTracks, req.TotalDiscs)
 	filePath := filepath.Join(outputDir, filename)
 
 	if fileInfo, err := os.Stat(filePath); err == nil && fileInfo.Size() > 0 {
